@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru" dir="ltr">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="robots" content="noindex">
+    <title>WebSocket chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:400,700&amp;subset=cyrillic-ext">
+    <link rel="apple-touch-icon" sizes="57x57" href="/favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/favicon/manifest.json">
+    <meta name="msapplication-TileColor" content="#F2F6F7">
+    <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+    <meta name="theme-color" content="#F2F6F7">
+</head>
+<body>
+<header class="header">
+    <div class="container">
+        <div>
+            <div class="logo float-left pull-left"><img src="/img/logo.svg"></div>
+            <div class="login-block float-right pull-right">
+                <div id="login-block"></div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</header>
+<section class="content-wrapper fill-height" id="messages-list">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-10">
+                <div class="row">
+                    <div class="messages-list">
+                        <template v-for="item in messages">
+                            <div class="alert alert-info message" :class="{my:item.is_my,system:item.is_system}">
+                                <button class="close-system-msg btn" v-if="item.is_system" @click="closeThisMessage"><img src="/img/close-btn.svg"></button>
+                                <div v-if="item.is_system" class="system-message"><img class="android" src="/img/android.svg"></div>
+                                <div v-else="item.is_system" class="user-message"><img class="android" :src="item.image"></div>
+                                <div class="message-wrapper">
+                                    <div class="meta">
+                                        <div class="date-time">&lthree; {{item.date}} &rthree;</div>
+                                        <div class="name">&cir; {{item.name}} &cir;</div>
+                                        <div class="replay" @click="replay(item)">&#11184;</div>
+                                    </div>
+                                    <div class="text">{{item.message}}</div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 hidden-sm-down">
+                <div class="row">
+                    <div class="users-list">
+                        <div class="header">Online users</div>
+                        <template v-for="item in users">
+                            <div class="user">
+                                <div class="image">
+                                    <img :src="item.image">
+                                </div>
+                                <div class="name">{{item.login}}</div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-10">
+                <div class="row">
+                    <div class="submit">
+                        <div class="input-group">
+                            <input maxlength="512" :disabled="active ? false : true" v-model="value" @keyup.ctrl.enter="sendMessage" class="form-control">
+                            <button :disabled="active ? false : true" class="send input-group-addon btn btn-outline-info" @click="sendMessage">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="loader-wrapper" v-if="showLoader">
+        <div class="loader">
+            <div class="loader__bar"></div>
+            <div class="loader__bar"></div>
+            <div class="loader__bar"></div>
+            <div class="loader__bar"></div>
+            <div class="loader__bar"></div>
+            <div class="loader__ball"></div>
+        </div>
+    </div>
+</section>
+<footer class="footer"></footer>
+
+<template id="login-block-tpl">
+    <div v-if="active">
+        <modal v-if="showModal" @close="showModal = false"></modal>
+        <button class="btn btn-outline-success btn-signin" @click="showModal = true">
+            <span>Config</span>
+        </button>
+        <button class="btn btn-outline-danger btn-signin" @click="logOut">
+            <span>Logout</span>
+        </button>
+    </div>
+    <div v-else="active">
+        <button class="btn btn-outline-info btn-signin" @click="show('signIn')">
+            <span>Sign in</span>
+        </button>
+        <button class="btn btn-outline-warning btn-signup" @click="show('signUp')">
+            <span>Sign up</span>
+        </button>
+        <div class="down-slide-block" :class="{visible:showSignInPanel}">
+            <div class="input-group">
+                <div class="inputs-wrapper">
+                    <input class="form-control" autocomplete="off" v-model="login" placeholder="Login">
+                    <input class="form-control" autocomplete="off" v-model="password" type="password" placeholder="Password">
+                    <input v-if="showEmail" class="form-control" autocomplete="off" v-model="email" placeholder="Email">
+                </div>
+                <button class="btn btn-outline-info" v-if="showSignUpButton" @click="signUp">Sign Up</button>
+                <button class="btn btn-outline-info" v-else="showSignUpButton" @click="signIn">Sign In</button>
+            </div>
+            <div class="errors-list">
+                <div v-for="item in errors" class="alert" :class="item.type">{{item.text}}</div>
+            </div>
+        </div>
+    </div>
+</template>
+<template id="config-modal">
+    <transition name="modal">
+        <div class="modal-mask">
+            <div class="modal-wrapper">
+                <div class="modal-container">
+                    <div class="modal-header">
+                        <slot name="header">
+                            <button class="modal-default-button close-btn" @click="$emit('close')">
+                                <img src="/img/close-btn.svg">
+                            </button>
+                            <div>
+                                Profile config
+                            </div>
+                        </slot>
+                    </div>
+                    <div class="modal-body">
+                        <slot name="body">
+                            <div class="change-password"></div>
+                        </slot>
+                    </div>
+                    <!--<div class="modal-footer">
+                        <slot name="footer">
+                            default footer
+                        </slot>
+                    </div>-->
+                </div>
+            </div>
+        </div>
+    </transition>
+</template>
+
+<script src="/js/q.min.js"></script>
+<script src="/js/wsrpc.min.js"></script>
+<script src="/js/vue.js"></script>
+<script src="/js/common.js"></script>
+<!--<script type="text/javascript" async src="//cdnjs.cloudflare.com/ajax/libs/bootstrap.native/2.0.15/bootstrap-native-v4.min.js"></script>-->
+</body>
+</html>

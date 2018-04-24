@@ -1,0 +1,7 @@
+/dist/*.db
+!/dist/dist.db
+/dist/secret.txt
+/package-lock.json
+/yarn.lock
+.idea/
+__pycache__/

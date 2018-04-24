@@ -1,0 +1,241 @@
+body {
+  background: #F2F6F7;
+  font-family: Roboto, sans-serif;
+}
+body, html,
+.fill-height {
+  min-height: 100%;
+  height: 100%;
+  height: 100vh;
+}
+header.header {
+  position: absolute;
+  width: 100%;
+  .logo {
+    margin-top: .1rem;
+  }
+}
+.errors-list{
+  &:not(:empty) {
+    margin-top: .7rem;
+  }
+}
+.login-block {
+  padding-top: .3rem;
+  position: relative;
+  button {
+    cursor: pointer;
+  }
+}
+.down-slide-block {
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  padding: .3rem;
+  background: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0 0 1em #ccc;
+  margin-top: .2rem;
+  min-width: 15.625rem;
+  max-width: 100%;
+  display: none;
+  &.visible {
+    display: block;
+  }
+  .inputs-wrapper {
+    padding-right: .1rem;
+  }
+  input.form-control {
+    width: 100%;
+    & + input.form-control {
+      margin-top: .1rem;
+    }
+  }
+}
+.down-slide-block .errors-list .alert {
+  margin-bottom: .4rem;
+  &:last-child {
+    margin-bottom: .1rem;
+  }
+}
+#messages-list {
+  padding-top: 50px;
+  .messages-list {
+    width: 100%;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    height: 100%;
+    height: calc(~'100vh - 95px');
+    overflow: auto;
+    background-color: #fff;
+    -ms-overflow-style: none;  // IE 10+
+    //overflow: -moz-scrollbars-none;  // Firefox
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+  .message {
+    margin-bottom: .6rem;
+    position: relative;
+    &.my {
+      background-color: rgba(117,255,150,0.1);
+    }
+    &.system {
+      background-color: rgba(255, 216, 216, 0.33);
+    }
+  }
+  & + div.submit {
+    padding-top: 5px;
+  }
+  .message-wrapper {
+    width: calc(~'100%' - 5rem);
+  }
+  .meta {
+    .date-time,
+    .name,
+    .replay {
+      display: inline-block;
+    }
+    //box-shadow: 0 0 10px rgba(0, 255, 79, .05) inset, 0 0 10px rgba(0, 255, 37, .05);
+    //border-radius: .4rem;
+    .date-time {
+      margin-right: .7em;
+    }
+    .name {
+      font-weight: bold;
+    }
+    .replay {
+      cursor: pointer;
+    }
+  }
+  .system .meta .replay {
+    display: none;
+  }
+  .meta,
+  .text {
+    //padding: .2rem .5rem;
+  }
+  .user-message,
+  .system-message {
+    position: absolute;
+    right: .1rem;
+    top: .1rem;
+    padding-bottom: .2rem;
+    height: 100%;
+    img {
+      max-height: 100%;
+      //max-width: 100%;
+      //&.android {
+      //  min-height: 100%;
+      //}
+    }
+  }
+  .system-message img {
+    height: 4rem;
+  }
+}
+button.send {
+  cursor: pointer;
+}
+.btn.close-system-msg {
+  padding: 0 2px;
+}
+.users-list {
+  padding: .8rem;
+  .header {
+    font-weight: bold;
+    font-size: large;
+  }
+  .user {
+    display: flex;
+    .name {
+      padding-left: .3rem;
+      //font-weight: bold;
+      word-break: break-all;
+    }
+    & + .user {
+      padding-top: .6rem;
+    }
+  }
+}
+.submit {
+  width: 100%;
+}
+
+@media (max-width: 575px) { //xs styles
+  #messages-list {
+    .meta {
+      font-size: 0.95rem;
+      opacity: .9;
+    }
+    .system-message img,
+    .user-message img {
+      max-height: 66px;
+    }
+  }
+}
+
+.modal-mask {
+  position: fixed;
+  z-index: 9998;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, .5);
+  display: table;
+  transition: opacity .3s ease;
+}
+.modal-wrapper {
+  display: table-cell;
+  vertical-align: middle;
+}
+.modal-container {
+  width: 300px;
+  margin: 0 auto;
+  padding: 20px 30px;
+  background-color: #fff;
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
+  transition: all .3s ease;
+}
+.modal-body {
+  margin: 20px 0;
+}
+.modal-default-button {
+  float: right;
+}
+.modal-enter {
+  opacity: 0;
+}
+.modal-leave-active {
+  opacity: 0;
+}
+.modal-enter .modal-container,
+.modal-leave-active .modal-container {
+  -webkit-transform: scale(1.1);
+  transform: scale(1.1);
+}
+.modal-header {
+  position: relative;
+  padding: 0 1rem 0 0;
+  button.close-btn {
+    position: absolute;
+    right: 0;
+    top: 0;
+    background: transparent;
+    border: 0;
+    padding: 0 .25rem;
+  }
+  h3 {
+    margin-top: 0;
+    padding: 0;
+    //color: #42b983;
+  }
+}
+
+.login-block .input-group {
+  flex-wrap: nowrap; // FF hack
+}
+
+@import "loader";
