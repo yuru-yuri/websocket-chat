@@ -1,16 +1,17 @@
 from sqlite3 import connect
 from os.path import isfile, join
 from shutil import copyfile
-from abc import ABCMeta, abstractclassmethod
+from abc import ABCMeta, abstractmethod
 from chat.utils import root_path
 
 
 class BaseDb(metaclass=ABCMeta):
     _cursor = None
     _connector = None
+    _db_path = 'database.db'
 
-    @abstractclassmethod
-    def make_schema(self, path: str):
+    @abstractmethod
+    def make_schema(self):
         pass
 
     @staticmethod
@@ -30,12 +31,12 @@ class BaseDb(metaclass=ABCMeta):
             copyfile(dist_db, path)
         return path, make
 
-    def __init__(self, path: str):
-        path, make = self._get_abs_path(path)
+    def __init__(self):
+        path, make = self._get_abs_path(self._db_path)
         self._connector = connect(path)
         self._connector.row_factory = self._row_factory
         self._cursor = self._connector.cursor()
-        make and self.make_schema(path)
+        make and self.make_schema()
 
     def __del__(self):
         self._cursor and self._cursor.close()

@@ -4,10 +4,6 @@ from .utils import email2avatar
 
 
 class ChatWebSocket(WebSocket):
-    users = None
-    messages = None
-    rowid = 0
-
     def _unresolvable(self, *args, **kwargs):
         pass
 

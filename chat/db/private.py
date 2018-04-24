@@ -1,16 +1,15 @@
 from . import BaseDb
 
 
-class Message(BaseDb):
+class Private(BaseDb):
     """
-    User-to-room messages
+    Private user-to-user messages
     """
     def make_schema(self):
         self.execute("""
-                CREATE TABLE messages (
+                CREATE TABLE private (
                     `user`	UNSIGNEDBIGINT,
                     `message`	TEXT,
-                    `room`	INTEGER NULL,
                     `on_message`	INTEGER,
                     `date`	datetime,
                     PRIMARY KEY(user)

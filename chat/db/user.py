@@ -2,10 +2,7 @@ from . import BaseDb
 
 
 class User(BaseDb):
-    def __init__(self):
-        super().__init__('users.db')
-
-    def make_schema(self, path: str):
+    def make_schema(self):
         self.execute("""
                 CREATE TABLE users (
                     `login`	TEXT,
@@ -20,6 +17,6 @@ class User(BaseDb):
 
     def get_user(self, login):
         return self.one("""
-        SELECT ROWID, *
+        SELECT rowid, *
         FROM users WHERE login = ?
          """, (login, ))
